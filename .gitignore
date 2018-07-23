@@ -26,3 +26,15 @@ platform.info
 
 # Files made by Csmith-generated programs.
 vol_addr.txt
+
+# Backup files
+*~
+
+# Files that main csmith was not ignoring
+.hypothesis
+CMakeCache.txt
+runtime/libcsmith.so*
+cmake_install.cmake
+CMakeFiles
+config.h
+src/git_version.cpp
