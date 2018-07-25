@@ -58,30 +58,3 @@ if __name__ == '__main__':
             name = hashlib.sha1(result).hexdigest()[:16]
             with open(os.path.join(EXAMPLES, name), 'wb') as outfile:
                 outfile.write(result)
-
-
-        """
-
-        runner = StateMachineRunner(data, 1000)
-        try:
-            with BuildContext(data):
-                runner.run(SympyRules(), print_steps=False)
-        except UnsatisfiedAssumption:
-            continue
-        except (KeyboardInterrupt, HypothesisException):
-            raise
-        except BaseException:
-            traceback.print_exc()
-
-            result = bytes(data.buffer)
-            name = hashlib.sha1(result).hexdigest()[:16]
-            with open(os.path.join(EXAMPLES, name), 'wb') as o:
-                o.write(result)
-        """
-    
-        """
-            with open(os.path.join(EXAMPLES, name), 'rb') as infile:
-                data2 = ConjectureData.for_buffer(infile.read())
-
-            gen(data2, "example2.c")
-        """
