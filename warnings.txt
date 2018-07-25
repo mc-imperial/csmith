@@ -1,0 +1,11 @@
+-Waddress
+-Wbool-compare
+-Wbool-operation
+-Woverflow
+-Wpointer-sign
+-Wtautological-compare
+-Wunused-but-set-variable
+-Wunused-const-variable=
+-Wunused-function
+-Wunused-value
+-Wunused-variable
