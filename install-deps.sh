@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-apt-get install vim coreutils less
+apt-get update
+apt-get install -y vim coreutils less
 
 git clone https://github.com/pyenv/pyenv.git ~/.pyenv
 
