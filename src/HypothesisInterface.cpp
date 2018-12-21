@@ -11,7 +11,7 @@
 
 #define BUF_SIZE 80
 
-static const char * fifo = "/tmp/fifo";
+static const char * fifo = getenv("HYPOTHESISFIFO");
 static char incoming[BUF_SIZE];
 static char outgoing[BUF_SIZE];
 
