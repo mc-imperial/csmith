@@ -826,7 +826,7 @@ VariableSelector::make_init_value(Effect::Access access, const CGContext &cg_con
 		ERROR_GUARD(NULL);
 		if (t->eType == eSimple)
 			assert(t->simple_type != eVoid);
-		return Constant::make_random(t);
+		return HYPOTHESIS_DRAW(Constant, t);
 	}
 	ERROR_GUARD(NULL);
 	// for pointers, take address of a random visible local variable
