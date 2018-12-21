@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#define BUF_SIZE 80
+#define BUF_SIZE 200
 
 static const char * fifo = getenv("HYPOTHESISFIFO");
 static char incoming[BUF_SIZE];
@@ -48,8 +48,11 @@ void hypothesisTerminateConnection() {
   getAck();
 }
 
-void hypothesisStartExample() {
-  writeCommand("START");
+void hypothesisStartExample(char *label) {
+  int fd = open(fifo, O_WRONLY);
+  sprintf(outgoing, "START %s\n", label);
+  write(fd, outgoing, strlen(outgoing) + 1);
+  close(fd);
   getAck();
 }
 
