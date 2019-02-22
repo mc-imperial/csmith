@@ -11,10 +11,11 @@ pipeout = None
 
 
 def write_result(str):
-    pipeout = open(result_reader, "w")
-    pipeout.write(str + "\0")
+    global pipeout
+    if pipeout is None:
+        pipeout = open(result_reader, "w")
+    pipeout.write(str + "\n")
     pipeout.flush()
-    pipeout.close()
 
 
 def read_command():
