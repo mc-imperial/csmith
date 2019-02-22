@@ -4,42 +4,51 @@ import tempfile
 import sys
 import shutil
 
-pipe_name = None
+command_writer = result_reader = None
 
-def write(str):
-    pipeout = open(pipe_name, "w")
+
+pipeout = None
+
+
+def write_result(str):
+    pipeout = open(result_reader, "w")
     pipeout.write(str + "\0")
+    pipeout.flush()
     pipeout.close()
 
-def read():
-    pipein = open(pipe_name, "r")
+
+def read_command():
+    pipein = open(command_writer, "r")
     line = pipein.readline()[:-1]
     pipein.close()
     return line
 
 def ack():
-    write("ACK")
+    write_result("ACK")
 
 def gen(data, output_name):
-    global pipe_name
+    global command_writer, result_reader
 
     env = dict(os.environ)
     pipe_dir = tempfile.mkdtemp()
-    pipe_name = os.path.join(pipe_dir, "hypothesisfifo")
-    env["HYPOTHESISFIFO"] = pipe_name
+    command_writer = os.path.join(pipe_dir, "hypothesisfifo.commands")
+    result_reader = os.path.join(pipe_dir, "hypothesisfifo.results")
+    env["HYPOTHESISFIFOCOMMANDS"] = command_writer
+    env["HYPOTHESISFIFORESULTS"] = result_reader
 
-    os.mkfifo(pipe_name)
+    os.mkfifo(command_writer)
+    os.mkfifo(result_reader)
     
     proc = subprocess.Popen(["./src/csmith", "-o", output_name], env=env, stdout=sys.stdout, stderr=sys.stderr)
     try:
         while True:
-            line = read()
+            line = read_command()
             if line == "TERMINATE":
                 ack()
                 break
             elif line == "RAND":
                 value = str(data.draw_bits(31))
-                write(value)
+                write_result(value)
             elif line.startswith("START "):
                 _, label = line.split()
                 data.start_example(label.strip())

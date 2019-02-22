@@ -11,19 +11,20 @@
 
 #define BUF_SIZE 200
 
-static const char * fifo = getenv("HYPOTHESISFIFO");
+static const char * fifo_commands = getenv("HYPOTHESISFIFOCOMMANDS");
+static const char * fifo_results = getenv("HYPOTHESISFIFORESULTS");
 static char incoming[BUF_SIZE];
 static char outgoing[BUF_SIZE];
 
 static void writeCommand(const char * command) {
-  int fd = open(fifo, O_WRONLY);
+  int fd = open(fifo_commands, O_WRONLY);
   strcpy(outgoing, command);
   write(fd, outgoing, strlen(outgoing) + 1);
   close(fd);
 }
 
 static void readResult() {
-  int fd = open(fifo, O_RDONLY);
+  int fd = open(fifo_results, O_RDONLY);
   read(fd, incoming, sizeof(incoming));
   close(fd);
 }
@@ -40,7 +41,8 @@ unsigned long hypothesisGetRand() {
 }
 
 void hypothesisInitConnection() {
-  mkfifo(fifo, 0666);
+  mkfifo(fifo_results, 0666);
+  mkfifo(fifo_commands, 0666);
 }
 
 void hypothesisTerminateConnection() {
@@ -49,7 +51,7 @@ void hypothesisTerminateConnection() {
 }
 
 void hypothesisStartExample(const char *label) {
-  int fd = open(fifo, O_WRONLY);
+  int fd = open(fifo_commands, O_WRONLY);
   sprintf(outgoing, "START %s", label);
   assert(strlen(outgoing) > 0);
   write(fd, outgoing, strlen(outgoing) + 1);
