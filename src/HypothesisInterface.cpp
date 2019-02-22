@@ -1,22 +1,26 @@
 #include "HypothesisInterface.h"
 
-#include <stdio.h>
-#include <string.h>
+#include <assert.h>
 #include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <stdlib.h>
-#include <assert.h>
 
 #define BUF_SIZE 200
 
-static const char * fifo_commands = getenv("HYPOTHESISFIFOCOMMANDS");
-static const char * fifo_results = getenv("HYPOTHESISFIFORESULTS");
+static const char *fifo_commands = getenv("HYPOTHESISFIFOCOMMANDS");
+static const char *fifo_results = getenv("HYPOTHESISFIFORESULTS");
+
+FILE *results_file = NULL;
+FILE *command_file = NULL;
+
 static char incoming[BUF_SIZE];
 static char outgoing[BUF_SIZE];
 
-static void writeCommand(const char * command) {
+static void writeCommand(const char *command) {
   int fd = open(fifo_commands, O_WRONLY);
   strcpy(outgoing, command);
   write(fd, outgoing, strlen(outgoing) + 1);
@@ -24,9 +28,20 @@ static void writeCommand(const char * command) {
 }
 
 static void readResult() {
-  int fd = open(fifo_results, O_RDONLY);
-  read(fd, incoming, sizeof(incoming));
-  close(fd);
+  if (results_file == NULL)
+    results_file = fopen(fifo_results, "r");
+  assert(results_file != NULL);
+  int i = 0;
+  while (true) {
+    int c = fgetc(results_file);
+    if (c == EOF)
+      continue;
+    if (c == '\n')
+      break;
+    assert(i < BUF_SIZE);
+    incoming[i++] = c;
+  }
+  incoming[i] = 0;
 }
 
 static void getAck() {
@@ -40,10 +55,7 @@ unsigned long hypothesisGetRand() {
   return atol(incoming);
 }
 
-void hypothesisInitConnection() {
-  mkfifo(fifo_results, 0666);
-  mkfifo(fifo_commands, 0666);
-}
+void hypothesisInitConnection() {}
 
 void hypothesisTerminateConnection() {
   writeCommand("TERMINATE");
