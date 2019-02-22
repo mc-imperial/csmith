@@ -20,11 +20,16 @@ FILE *command_file = NULL;
 static char incoming[BUF_SIZE];
 static char outgoing[BUF_SIZE];
 
-static void writeCommand(const char *command) {
+
+static void writeOutgoing(){
   FILE *fd = fopen(fifo_commands, "w");
-  strcpy(outgoing, command);
   fwrite(outgoing, sizeof(char), strlen(outgoing) + 1, fd);
   fclose(fd);
+}
+
+static void writeCommand(const char *command) {
+  strcpy(outgoing, command);
+  writeOutgoing();
 }
 
 static void readResult() {
@@ -63,11 +68,9 @@ void hypothesisTerminateConnection() {
 }
 
 void hypothesisStartExample(const char *label) {
-  int fd = open(fifo_commands, O_WRONLY);
   sprintf(outgoing, "START %s", label);
   assert(strlen(outgoing) > 0);
-  write(fd, outgoing, strlen(outgoing) + 1);
-  close(fd);
+  writeOutgoing();
   getAck();
 }
 
