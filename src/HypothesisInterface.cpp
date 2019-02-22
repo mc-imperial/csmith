@@ -15,19 +15,20 @@ static const char *fifo_commands = getenv("HYPOTHESISFIFOCOMMANDS");
 static const char *fifo_results = getenv("HYPOTHESISFIFORESULTS");
 
 FILE *results_file = NULL;
-FILE *command_file = NULL;
+FILE *commands_file = NULL;
 
 static char incoming[BUF_SIZE];
 static char outgoing[BUF_SIZE];
 
 
 static void writeOutgoing(){
-  FILE *fd = fopen(fifo_commands, "w");
+  if (commands_file == NULL)
+    commands_file = fopen(fifo_commands, "w");
   int n = strlen(outgoing);
   assert(n < 256);
-  fputc(n, fd);
-  fwrite(outgoing, sizeof(char), strlen(outgoing), fd);
-  fclose(fd);
+  fputc(n, commands_file);
+  fwrite(outgoing, sizeof(char), strlen(outgoing), commands_file);
+  fflush(commands_file);
 }
 
 static void writeCommand(const char *command) {
