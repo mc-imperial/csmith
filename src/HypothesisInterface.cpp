@@ -21,10 +21,10 @@ static char incoming[BUF_SIZE];
 static char outgoing[BUF_SIZE];
 
 static void writeCommand(const char *command) {
-  int fd = open(fifo_commands, O_WRONLY);
+  FILE *fd = fopen(fifo_commands, "w");
   strcpy(outgoing, command);
-  write(fd, outgoing, strlen(outgoing) + 1);
-  close(fd);
+  fwrite(outgoing, sizeof(char), strlen(outgoing) + 1, fd);
+  fclose(fd);
 }
 
 static void readResult() {
