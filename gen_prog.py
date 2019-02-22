@@ -7,7 +7,7 @@ import shutil
 command_writer = result_reader = None
 
 
-pipeout = None
+pipeout = pipein = None
 
 
 def write_result(str):
@@ -19,10 +19,15 @@ def write_result(str):
 
 
 def read_command():
-    pipein = open(command_writer, "r")
-    line = pipein.readline()[:-1]
-    pipein.close()
-    return line
+    global pipein
+    if pipein is None:
+        pipein = open(command_writer, "rb")
+    while True:
+        c = pipein.read(1)
+        if not c:
+            continue
+        n = c[0]
+        return pipein.read(n).decode('ascii')
 
 def ack():
     write_result("ACK")

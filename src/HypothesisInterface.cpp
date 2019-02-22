@@ -23,7 +23,10 @@ static char outgoing[BUF_SIZE];
 
 static void writeOutgoing(){
   FILE *fd = fopen(fifo_commands, "w");
-  fwrite(outgoing, sizeof(char), strlen(outgoing) + 1, fd);
+  int n = strlen(outgoing);
+  assert(n < 256);
+  fputc(n, fd);
+  fwrite(outgoing, sizeof(char), strlen(outgoing), fd);
   fclose(fd);
 }
 
