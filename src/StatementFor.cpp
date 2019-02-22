@@ -324,7 +324,7 @@ StatementFor::make_random_array_loop(const CGContext &cg_context)
 	RWDirective rwd(no_reads, no_writes, all_must_reads, all_must_writes);
 	// create CGContext for loop
 	CGContext loop_cg_context(cg_context, &rwd, NULL, 0);
-	StatementFor* sf = make_random(loop_cg_context);
+	StatementFor* sf = HYPOTHESIS_DRAW(StatementFor, loop_cg_context);
 	return sf;
 }
 

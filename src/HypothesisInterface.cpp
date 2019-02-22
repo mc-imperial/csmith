@@ -48,9 +48,10 @@ void hypothesisTerminateConnection() {
   getAck();
 }
 
-void hypothesisStartExample(char *label) {
+void hypothesisStartExample(const char *label) {
   int fd = open(fifo, O_WRONLY);
-  sprintf(outgoing, "START %s\n", label);
+  sprintf(outgoing, "START %s", label);
+  assert(strlen(outgoing) > 0);
   write(fd, outgoing, strlen(outgoing) + 1);
   close(fd);
   getAck();

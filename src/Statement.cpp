@@ -308,7 +308,7 @@ Statement::make_random(CGContext &cg_context,
 	}
 	// sometimes make_random may return 0 for various reasons. keep generating
 	if (s == 0) {
-		return make_random(cg_context);
+		return HYPOTHESIS_DRAW(Statement, cg_context);
 	}
 	s->func = cg_context.get_current_func();
 	s->parent = cg_context.get_current_block();

@@ -8,7 +8,7 @@ void hypothesisEndInterval();
 void hypothesisInitConnection();
 
 void hypothesisTerminateConnection();
-void hypothesisStartExample(char* label);
+void hypothesisStartExample(const char* label);
 void hypothesisEndExample();
 
 unsigned long hypothesisGetRand();

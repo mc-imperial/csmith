@@ -1,6 +1,10 @@
 import os
 import subprocess
-pipe_name = '/tmp/fifo'
+import tempfile
+import sys
+import shutil
+
+pipe_name = None
 
 def write(str):
     pipeout = open(pipe_name, "w")
@@ -17,14 +21,17 @@ def ack():
     write("ACK")
 
 def gen(data, output_name):
+    global pipe_name
 
-    if not os.path.exists(pipe_name):
-        os.mkfifo(pipe_name)
+    env = dict(os.environ)
+    pipe_dir = tempfile.mkdtemp()
+    pipe_name = os.path.join(pipe_dir, "hypothesisfifo")
+    env["HYPOTHESISFIFO"] = pipe_name
+
+    os.mkfifo(pipe_name)
     
+    proc = subprocess.Popen(["./src/csmith", "-o", output_name], env=env, stdout=sys.stdout, stderr=sys.stderr)
     try:
-
-        proc = subprocess.Popen(["./src/csmith", "-o", output_name])
-
         while True:
             line = read()
             if line == "TERMINATE":
@@ -33,14 +40,18 @@ def gen(data, output_name):
             elif line == "RAND":
                 value = str(data.draw_bits(31))
                 write(value)
-            elif line == "START":
-                data.start_example(1)
+            elif line.startswith("START "):
+                _, label = line.split()
+                data.start_example(label.strip())
                 ack()
-            elif line == "STOP":
+            elif line == "END":
                 data.stop_example()
                 ack()
+            # Terminated improperly
+            elif not line:
+                break
             else:
-                raise Exception("Unknown command " + line)
+                raise Exception("Unknown command %r" % (line,))
 
         proc.wait()
 
@@ -49,3 +60,4 @@ def gen(data, output_name):
             proc.kill()
         except OSError:
             pass
+        shutil.rmtree(pipe_dir)
